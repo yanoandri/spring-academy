@@ -1,5 +1,7 @@
 package com.example.academy.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import javax.persistence.*;
 
 @Entity
@@ -8,6 +10,7 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
+
     private String username;
     private String password;
     private String email;
@@ -23,6 +26,9 @@ public class User {
 
     @Column(name = "phone_number")
     private String phoneNumber;
+
+    @Column(name = "is_login")
+    private boolean isLogin;
 
     public long getId() {
         return id;
@@ -98,5 +104,13 @@ public class User {
 
     public String getFullName(){
         return this.firstName + " " + this.lastName;
+    }
+
+    public boolean isLogin() {
+        return isLogin;
+    }
+
+    public void setLogin(boolean login) {
+        isLogin = login;
     }
 }

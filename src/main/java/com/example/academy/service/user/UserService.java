@@ -2,8 +2,11 @@ package com.example.academy.service.user;
 
 import com.example.academy.model.entity.User;
 
-import java.util.List;
-
 public interface UserService {
-    List<User> getAllUsers();
+    int registerUsers(User user);
+    int login(User user);
+    int resetPassword(User user);
+    int editUser(Long id,User user);
+    int logout(Long id);
+    User showProfile(Long id);
 }

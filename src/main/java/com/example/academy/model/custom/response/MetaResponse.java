@@ -1,4 +1,4 @@
-package com.example.academy.model.custom;
+package com.example.academy.model.custom.response;
 
 public class MetaResponse {
 

@@ -1,16 +1,13 @@
 package com.example.academy.controller.user;
 
-import com.example.academy.model.custom.MetaResponse;
-import com.example.academy.model.custom.Response;
+import com.example.academy.model.custom.response.MetaResponse;
+import com.example.academy.model.custom.response.Response;
 import com.example.academy.model.entity.User;
 import com.example.academy.service.user.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-
-import java.util.List;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/user")
@@ -21,19 +18,58 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping
-    public Response getAllUser() {
+    @PostMapping(value = "/login")
+    public ResponseEntity login(@RequestBody User user){
         Response response = new Response();
-        MetaResponse metaResponse = new MetaResponse();
-
-        metaResponse.setCode(200);
-        metaResponse.setMessage("success");
-        metaResponse.setDebugInfo("success");
-
+        int isSuccess = userService.login(user);
         response.setStatus(Response.MESSAGE_OK);
-        response.setData(userService.getAllUsers());
-        response.setMeta(metaResponse);
+        response.setMeta(new MetaResponse(isSuccess, "Login success", ""));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
 
-        return response;
+    @GetMapping(value = "/logout")
+    public ResponseEntity logout(@PathVariable("id") Long id){
+        Response response = new Response();
+        int isSuccess = userService.logout(id);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setMeta(new MetaResponse(isSuccess, "Logout success", ""));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @PostMapping(value = "/register")
+    public ResponseEntity register(@RequestBody User user){
+        Response response = new Response();
+        int isSuccess = userService.registerUsers(user);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setMeta(new MetaResponse(isSuccess, "Register user success", ""));
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/reset/password/{id}")
+    public ResponseEntity resetPassword(@RequestBody User user){
+        Response response = new Response();
+        int isSuccess = userService.resetPassword(user);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setMeta(new MetaResponse(isSuccess, "Reset password success", ""));
+        return new ResponseEntity(response, HttpStatus.CREATED);
+    }
+
+    @PostMapping(value = "/edit/user/{id}")
+    public ResponseEntity editUser(@PathVariable("id") Long id, @RequestBody User user){
+        Response response = new Response();
+        int isSuccess = userService.editUser(id,user);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setMeta(new MetaResponse(isSuccess, "Update profile success", ""));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/show/profile/{id}")
+    public ResponseEntity showProfile(@PathVariable("id") Long id){
+        Response response = new Response();
+        User user = userService.showProfile(id);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setData(user);
+        response.setMeta(new MetaResponse(HttpStatus.OK.value(), "Data found", ""));
+        return new ResponseEntity(response, HttpStatus.OK);
     }
 }
