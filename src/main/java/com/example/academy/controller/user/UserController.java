@@ -21,9 +21,10 @@ public class UserController {
     @PostMapping(value = "/login")
     public ResponseEntity login(@RequestBody User user){
         Response response = new Response();
-        int isSuccess = userService.login(user);
+        User userLoggedIn = userService.login(user);
         response.setStatus(Response.MESSAGE_OK);
-        response.setMeta(new MetaResponse(isSuccess, "Login success", ""));
+        response.setData(userLoggedIn);
+        response.setMeta(new MetaResponse(HttpStatus.OK.value(), "Login success", ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

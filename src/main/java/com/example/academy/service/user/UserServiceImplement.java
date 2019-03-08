@@ -32,7 +32,7 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public int login(User user) {
+    public User login(User user) {
         User temp = userRepository.findByUsername(user.getUsername());
         if (temp == null) throw new DataValidationExceptionHandler("User not found!");
         String password = Helper.getHashPassword(user.getPassword());
@@ -40,7 +40,7 @@ public class UserServiceImplement implements UserService {
         if(temp.isLogin())throw new DataValidationExceptionHandler("User already login!");
         temp.setLogin(true);
         this.userRepository.save(temp);
-        return 200;
+        return temp;
     }
 
     @Override
