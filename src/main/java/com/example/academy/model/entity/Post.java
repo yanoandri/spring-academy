@@ -1,6 +1,9 @@
 package com.example.academy.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.hibernate.engine.internal.Cascade;
 
 import javax.persistence.*;
 import java.util.Date;
@@ -17,6 +20,14 @@ public class Post {
     @Column(name = "category_id")
     private long categoryId;
 
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", referencedColumnName = "id", insertable = false, updatable = false)
+    private Category category;
+
+    @Column(name = "user_id")
+    private long userId;
+
     @Column(name = "created_date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private Date createdDate;
@@ -25,8 +36,9 @@ public class Post {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd hh:mm:ss")
     private Date updatedDate;
 
-    @Column(name = "user_id")
-    private long userId;
+    @Column(name = "post_slug")
+    private String postSlug;
+
 
     public long getId() {
         return id;
@@ -82,5 +94,21 @@ public class Post {
 
     public void setUserId(long userId) {
         this.userId = userId;
+    }
+
+    public String getPostSlug() {
+        return postSlug;
+    }
+
+    public void setPostSlug(String postSlug) {
+        this.postSlug = postSlug;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

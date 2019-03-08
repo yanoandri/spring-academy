@@ -32,7 +32,7 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public User login(User user) {
+    public int login(User user) {
         User temp = userRepository.findByUsername(user.getUsername());
         if (temp == null) throw new DataValidationExceptionHandler("User not found!");
         String password = Helper.getHashPassword(user.getPassword());
@@ -40,7 +40,7 @@ public class UserServiceImplement implements UserService {
         if(temp.isLogin())throw new DataValidationExceptionHandler("User already login!");
         temp.setLogin(true);
         this.userRepository.save(temp);
-        return temp;
+        return 200;
     }
 
     @Override
@@ -55,7 +55,7 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public int editUser(Long id,User user) {
+    public User editUser(Long id,User user) {
         if(!userRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("User not found!");
         User temp = userRepository.findById(id).get();
         if(!temp.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
@@ -66,7 +66,7 @@ public class UserServiceImplement implements UserService {
         temp.setAddress(user.getAddress());
         temp.setPhoneNumber(user.getPhoneNumber());
         userRepository.save(temp);
-        return 201;
+        return temp;
     }
 
     @Override

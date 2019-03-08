@@ -21,14 +21,13 @@ public class UserController {
     @PostMapping(value = "/login")
     public ResponseEntity login(@RequestBody User user){
         Response response = new Response();
-        User userLoggedIn = userService.login(user);
+        int isSuccess = userService.login(user);
         response.setStatus(Response.MESSAGE_OK);
-        response.setData(userLoggedIn);
-        response.setMeta(new MetaResponse(HttpStatus.OK.value(), "Login success", ""));
+        response.setMeta(new MetaResponse(isSuccess, "Login success", ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 
-    @GetMapping(value = "/logout")
+    @GetMapping(value = "/logout/{id}")
     public ResponseEntity logout(@PathVariable("id") Long id){
         Response response = new Response();
         int isSuccess = userService.logout(id);
@@ -46,7 +45,7 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/reset/password/{id}")
+    @PostMapping(value = "/reset/password")
     public ResponseEntity resetPassword(@RequestBody User user){
         Response response = new Response();
         int isSuccess = userService.resetPassword(user);
@@ -55,12 +54,13 @@ public class UserController {
         return new ResponseEntity(response, HttpStatus.CREATED);
     }
 
-    @PostMapping(value = "/edit/user/{id}")
+    @PostMapping(value = "/edit/{id}")
     public ResponseEntity editUser(@PathVariable("id") Long id, @RequestBody User user){
         Response response = new Response();
-        int isSuccess = userService.editUser(id,user);
+        User updatedUser = userService.editUser(id,user);
         response.setStatus(Response.MESSAGE_OK);
-        response.setMeta(new MetaResponse(isSuccess, "Update profile success", ""));
+        response.setData(updatedUser);
+        response.setMeta(new MetaResponse(HttpStatus.OK.value(), "Update profile success", ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }
 

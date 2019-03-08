@@ -1,8 +1,10 @@
 package com.example.academy.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "user")
@@ -27,6 +29,7 @@ public class User {
     @Column(name = "phone_number")
     private String phoneNumber;
 
+    @JsonIgnore
     @Column(name = "is_login")
     private boolean isLogin;
 
@@ -106,10 +109,13 @@ public class User {
         return this.firstName + " " + this.lastName;
     }
 
+
+    @JsonIgnore
     public boolean isLogin() {
         return isLogin;
     }
 
+    @JsonIgnore
     public void setLogin(boolean login) {
         isLogin = login;
     }
