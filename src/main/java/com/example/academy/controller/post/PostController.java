@@ -1,6 +1,5 @@
 package com.example.academy.controller.post;
 
-import com.example.academy.model.custom.request.PaginateRequest;
 import com.example.academy.model.custom.response.MetaResponse;
 import com.example.academy.model.custom.response.PaginateResponse;
 import com.example.academy.model.custom.response.Response;
@@ -11,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/post")
 public class PostController {
@@ -22,10 +19,11 @@ public class PostController {
         this.postService = postService;
     }
 
-    @PostMapping(value = "/show/all")
-    public ResponseEntity showAllPost(@RequestBody PaginateRequest paginateRequest){
+
+    @GetMapping(value = "/show/all")
+    public ResponseEntity showAllPost(@RequestParam("offset") int offset, @RequestParam("limit") int limit){
         Response response = new Response();
-        PaginateResponse paginateResponse = postService.showAllPost(paginateRequest);
+        PaginateResponse paginateResponse = postService.showAllPost(offset, limit);
         response.setStatus(Response.MESSAGE_OK);
         response.setData(paginateResponse);
         response.setMeta(new MetaResponse(HttpStatus.OK.value(), "success", ""));

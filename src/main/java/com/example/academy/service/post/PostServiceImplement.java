@@ -3,7 +3,6 @@ package com.example.academy.service.post;
 import com.example.academy.helper.Helper;
 import com.example.academy.model.custom.exception.DataValidationExceptionHandler;
 import com.example.academy.model.custom.exception.InputValidationExceptionHandler;
-import com.example.academy.model.custom.request.PaginateRequest;
 import com.example.academy.model.custom.response.PaginateResponse;
 import com.example.academy.model.entity.Post;
 import com.example.academy.repository.CategoryRepository;
@@ -32,10 +31,10 @@ public class PostServiceImplement implements PostService {
     private UserRepository userRepository;
 
     @Override
-    public PaginateResponse showAllPost(PaginateRequest paginateRequest) {
-        int totalData = postRepository.findAll().size();
-        Pageable paginateElement = PageRequest.of(paginateRequest.getOffset(),paginateRequest.getLimit(), Sort.by("updatedDate").descending());
-        List<Post> posts = postRepository.findAll(paginateElement).getContent();
+    public PaginateResponse showAllPost(int offset,int limit) {
+        int totalData = postRepository.findAllByIsDeletedFalse().size();
+        Pageable paginateElement = PageRequest.of(offset, limit, Sort.by("updatedDate").descending());
+        List<Post> posts = postRepository.findAllByIsDeletedFalse(paginateElement);
         List<Object> datas = new ArrayList<>(posts);
         PaginateResponse result = new PaginateResponse();
         result.setTotalRow(totalData);
@@ -45,14 +44,15 @@ public class PostServiceImplement implements PostService {
 
     @Override
     public Post showDetailPost(Long id) {
-        if(!postRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("Post not found");
-        return postRepository.findById(id).get();
+        Post post = postRepository.findByIdAndIsDeletedFalse(id);
+        if(post == null)throw new DataValidationExceptionHandler("Post not found");
+        return post;
     }
 
     @Override
     public Post createPost(Post post) {
         if(!userRepository.findById(post.getUserId()).isPresent())throw new InputValidationExceptionHandler("User not found");
-        if(!categoryRepository.findById(post.getCategoryId()).isPresent())throw new InputValidationExceptionHandler("Category not found");
+        if(categoryRepository.findByIdAndIsDeletedFalse(post.getCategoryId()) == null)throw new InputValidationExceptionHandler("Category not found");
         Post temp = new Post();
         temp.setTitle(post.getTitle());
         temp.setContent(post.getContent());
@@ -61,6 +61,7 @@ public class PostServiceImplement implements PostService {
         temp.setPostSlug(Helper.toSlug(post.getTitle()));
         temp.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         temp.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+        temp.setDeleted(false);
         postRepository.save(temp);
         return temp;
     }
@@ -68,9 +69,9 @@ public class PostServiceImplement implements PostService {
     @Override
     public Post editPost(Long id, Post post) {
         if(!userRepository.findById(post.getUserId()).isPresent())throw new InputValidationExceptionHandler("User not found");
-        if(!categoryRepository.findById(post.getCategoryId()).isPresent())throw new InputValidationExceptionHandler("Category not found");
-        if(!postRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("Post not found");
-        Post temp = postRepository.findById(id).get();
+        if(categoryRepository.findByIdAndIsDeletedFalse(post.getCategoryId()) == null)throw new InputValidationExceptionHandler("Category not found");
+        Post temp = postRepository.findByIdAndIsDeletedFalse(id);
+        if(temp == null)throw new DataValidationExceptionHandler("Post not found");
         temp.setTitle(post.getTitle());
         temp.setContent(post.getContent());
         temp.setCategoryId(post.getCategoryId());
@@ -83,8 +84,10 @@ public class PostServiceImplement implements PostService {
 
     @Override
     public int deletePost(Long id) {
-        if(!postRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("Post not found");
-        postRepository.deleteById(id);
+        Post post = postRepository.findByIdAndIsDeletedFalse(id);
+        if(post == null)throw new DataValidationExceptionHandler("Post not found");
+        post.setDeleted(true);
+        postRepository.save(post);
         return 200;
     }
 }

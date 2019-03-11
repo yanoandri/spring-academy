@@ -17,7 +17,7 @@ public class CategoryServiceImplement implements CategoryService {
 
     @Override
     public List<Category> showCategory() {
-        return categoryRepository.findAll();
+        return categoryRepository.findAllByIsDeletedFalse();
     }
 
     @Override
@@ -27,14 +27,15 @@ public class CategoryServiceImplement implements CategoryService {
         newCategory.setDescription(category.getDescription());
         newCategory.setCreatedDate(new Timestamp(System.currentTimeMillis()));
         newCategory.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
+        newCategory.setDeleted(false);
         categoryRepository.save(newCategory);
         return newCategory;
     }
 
     @Override
     public Category editCategory(Long id, Category category) {
-        if(!categoryRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("Category not found");
-        Category editCategory = categoryRepository.findById(id).get();
+        Category editCategory = categoryRepository.findByIdAndIsDeletedFalse(id);
+        if(editCategory == null)throw new DataValidationExceptionHandler("Category not found");
         editCategory.setName(category.getName());
         editCategory.setDescription(category.getDescription());
         editCategory.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
@@ -44,8 +45,10 @@ public class CategoryServiceImplement implements CategoryService {
 
     @Override
     public int deleteCategory(Long id) {
-        if(!categoryRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("Category not found");
-        categoryRepository.deleteById(id);
+        Category category = categoryRepository.findByIdAndIsDeletedFalse(id);
+        if(category == null)throw new DataValidationExceptionHandler("Category not found");
+        category.setDeleted(true);
+        categoryRepository.save(category);
         return 200;
     }
 }

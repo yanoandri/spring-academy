@@ -1,6 +1,5 @@
 package com.example.academy.model.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -25,9 +24,13 @@ public class Category {
     @JsonIgnore
     private Timestamp updatedDate;
 
+
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
     @JsonIgnore
     @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-    @OneToMany(fetch = FetchType.LAZY, orphanRemoval = true, cascade = CascadeType.PERSIST, mappedBy = "category")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "category")
     private List<Post> post;
 
     public long getId() {
@@ -77,5 +80,15 @@ public class Category {
 
     public void setPost(List<Post> post) {
         this.post = post;
+    }
+
+    @JsonIgnore
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    @JsonIgnore
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

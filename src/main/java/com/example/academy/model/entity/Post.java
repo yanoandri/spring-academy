@@ -39,6 +39,9 @@ public class Post {
     @Column(name = "post_slug")
     private String postSlug;
 
+    @Column(name = "is_deleted")
+    private Boolean isDeleted;
+
 
     public long getId() {
         return id;
@@ -110,5 +113,15 @@ public class Post {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    @JsonIgnore
+    public Boolean getDeleted() {
+        return isDeleted;
+    }
+
+    @JsonIgnore
+    public void setDeleted(Boolean deleted) {
+        isDeleted = deleted;
     }
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 @Service("UserServiceImplement")
 public class UserServiceImplement implements UserService {
+    private final String MASK_PASSWORD = "******";
 
     @Autowired
     private UserRepository userRepository;
@@ -32,7 +33,7 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public int login(User user) {
+    public User login(User user) {
         User temp = userRepository.findByUsername(user.getUsername());
         if (temp == null) throw new DataValidationExceptionHandler("User not found!");
         String password = Helper.getHashPassword(user.getPassword());
@@ -40,12 +41,13 @@ public class UserServiceImplement implements UserService {
         if(temp.isLogin())throw new DataValidationExceptionHandler("User already login!");
         temp.setLogin(true);
         this.userRepository.save(temp);
-        return 200;
+        temp.setPassword(MASK_PASSWORD);
+        return temp;
     }
 
     @Override
     public int resetPassword(User user) {
-        User temp = userRepository.findByUsername(user.getUsername());
+        User temp = userRepository.findByEmail(user.getEmail());
         if (temp == null) throw new DataValidationExceptionHandler("User not found!");
         String password = Helper.getHashPassword(user.getPassword());
         if(temp.getPassword().equalsIgnoreCase(password)) throw new InputValidationExceptionHandler("Your new password have to be different from the old password");
@@ -66,6 +68,7 @@ public class UserServiceImplement implements UserService {
         temp.setAddress(user.getAddress());
         temp.setPhoneNumber(user.getPhoneNumber());
         userRepository.save(temp);
+        temp.setPassword(MASK_PASSWORD);
         return temp;
     }
 
@@ -80,11 +83,11 @@ public class UserServiceImplement implements UserService {
     }
 
     @Override
-    public User showProfile(Long id)
-    {
+    public User showProfile(Long id) {
         if(!userRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("User not found!");
         User temp = userRepository.findById(id).get();
         if(!temp.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        temp.setPassword(MASK_PASSWORD);
         return temp;
     }
 
