@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 @Service("UserServiceImplement")
 public class UserServiceImplement implements UserService {
-    private static final String MASK_PWD = "******";
+    private static final String MASK_IDENTITY = "******";
 
     @Autowired
     private UserRepository userRepository;
@@ -43,7 +43,7 @@ public class UserServiceImplement implements UserService {
         if(temp.isLogin())throw new DataValidationExceptionHandler(Message.MSG_LGN_USER);
         temp.setLogin(true);
         this.userRepository.save(temp);
-        temp.setPassword(MASK_PWD);
+        temp.setPassword(MASK_IDENTITY);
         return temp;
     }
 
@@ -70,7 +70,7 @@ public class UserServiceImplement implements UserService {
         dataUser.setAddress(user.getAddress());
         dataUser.setPhoneNumber(user.getPhoneNumber());
         userRepository.save(dataUser);
-        dataUser.setPassword(MASK_PWD);
+        dataUser.setPassword(MASK_IDENTITY);
         return dataUser;
     }
 
@@ -89,7 +89,7 @@ public class UserServiceImplement implements UserService {
         User dataUser = userRepository.findById(id).orElse(null);
         if(dataUser == null)throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
         if(!dataUser.isLogin())throw new InputValidationExceptionHandler(Message.MSG_NOT_AUTH_USER);
-        dataUser.setPassword(MASK_PWD);
+        dataUser.setPassword(MASK_IDENTITY);
         return dataUser;
     }
 
