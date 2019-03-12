@@ -8,9 +8,11 @@ import com.example.academy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service("UserServiceImplement")
 public class UserServiceImplement implements UserService {
-    private final String MASK_PASSWORD = "******";
+    private static final String MASK_PWD = "******";
 
     @Autowired
     private UserRepository userRepository;
@@ -28,6 +30,7 @@ public class UserServiceImplement implements UserService {
         newUser.setLastName(user.getLastName());
         newUser.setGender(user.getGender());
         newUser.setPhoneNumber(user.getPhoneNumber());
+        newUser.setLogin(false);
         userRepository.save(newUser);
         return 201;
     }
@@ -41,7 +44,7 @@ public class UserServiceImplement implements UserService {
         if(temp.isLogin())throw new DataValidationExceptionHandler("User already login!");
         temp.setLogin(true);
         this.userRepository.save(temp);
-        temp.setPassword(MASK_PASSWORD);
+        temp.setPassword(MASK_PWD);
         return temp;
     }
 
@@ -58,37 +61,40 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public User editUser(Long id,User user) {
-        if(!userRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("User not found!");
-        User temp = userRepository.findById(id).get();
-        if(!temp.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
-        temp.setEmail(user.getEmail());
-        temp.setGender(user.getGender());
-        temp.setFirstName(user.getFirstName());
-        temp.setLastName(user.getLastName());
-        temp.setAddress(user.getAddress());
-        temp.setPhoneNumber(user.getPhoneNumber());
-        userRepository.save(temp);
-        temp.setPassword(MASK_PASSWORD);
-        return temp;
+        Optional temp = userRepository.findById(id);
+        User dataUser = (User)temp.get();
+        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        dataUser.setEmail(user.getEmail());
+        dataUser.setGender(user.getGender());
+        dataUser.setFirstName(user.getFirstName());
+        dataUser.setLastName(user.getLastName());
+        dataUser.setAddress(user.getAddress());
+        dataUser.setPhoneNumber(user.getPhoneNumber());
+        userRepository.save(dataUser);
+        dataUser.setPassword(MASK_PWD);
+        return dataUser;
     }
 
     @Override
     public int logout(Long id) {
-        if(!userRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("User not found!");
-        User temp = userRepository.findById(id).get();
-        if(!temp.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
-        temp.setLogin(false);
-        userRepository.save(temp);
+        Optional temp = userRepository.findById(id);
+        User dataUser = (User)temp.get();
+        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        dataUser.setLogin(false);
+        userRepository.save(dataUser);
         return 200;
     }
 
     @Override
     public User showProfile(Long id) {
-        if(!userRepository.findById(id).isPresent())throw new DataValidationExceptionHandler("User not found!");
-        User temp = userRepository.findById(id).get();
-        if(!temp.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
-        temp.setPassword(MASK_PASSWORD);
-        return temp;
+        Optional temp = userRepository.findById(id);
+        User dataUser = (User)temp.get();
+        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        dataUser.setPassword(MASK_PWD);
+        return dataUser;
     }
 
 

@@ -12,12 +12,16 @@ public class Helper {
     private static final Pattern WHITESPACE = Pattern.compile("[\\s]");
     private static final Pattern EDGESDHASHES = Pattern.compile("(^-|-$)");
 
+    private Helper(){
+
+    }
+
     public static String getHashPassword(String password) {
         String hexPassword = null;
         try{
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] encodedhash = digest.digest(password.getBytes(StandardCharsets.UTF_8));
-            StringBuffer hexString = new StringBuffer();
+            StringBuilder hexString = new StringBuilder();
             for (int i = 0; i < encodedhash.length; i++) {
                 String hex = Integer.toHexString(0xff & encodedhash[i]);
                 if(hex.length() == 1) hexString.append('0');
