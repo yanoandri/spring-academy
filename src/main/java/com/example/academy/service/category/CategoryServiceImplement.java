@@ -1,5 +1,6 @@
 package com.example.academy.service.category;
 
+import com.example.academy.helper.Message;
 import com.example.academy.model.custom.exception.DataValidationExceptionHandler;
 import com.example.academy.model.entity.Category;
 import com.example.academy.repository.CategoryRepository;
@@ -35,7 +36,7 @@ public class CategoryServiceImplement implements CategoryService {
     @Override
     public Category editCategory(Long id, Category category) {
         Category editCategory = categoryRepository.findByIdAndIsDeletedFalse(id);
-        if(editCategory == null)throw new DataValidationExceptionHandler("Category not found");
+        if(editCategory == null)throw new DataValidationExceptionHandler(Message.MSG_CATEGORY_NOT_FOUND);
         editCategory.setName(category.getName());
         editCategory.setDescription(category.getDescription());
         editCategory.setUpdatedDate(new Timestamp(System.currentTimeMillis()));
@@ -46,7 +47,7 @@ public class CategoryServiceImplement implements CategoryService {
     @Override
     public int deleteCategory(Long id) {
         Category category = categoryRepository.findByIdAndIsDeletedFalse(id);
-        if(category == null)throw new DataValidationExceptionHandler("Category not found");
+        if(category == null)throw new DataValidationExceptionHandler(Message.MSG_CATEGORY_NOT_FOUND);
         category.setDeleted(true);
         categoryRepository.save(category);
         return 200;

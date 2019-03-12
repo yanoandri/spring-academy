@@ -1,14 +1,13 @@
 package com.example.academy.service.user;
 
 import com.example.academy.helper.Helper;
+import com.example.academy.helper.Message;
 import com.example.academy.model.custom.exception.DataValidationExceptionHandler;
 import com.example.academy.model.custom.exception.InputValidationExceptionHandler;
 import com.example.academy.model.entity.User;
 import com.example.academy.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.Optional;
 
 @Service("UserServiceImplement")
 public class UserServiceImplement implements UserService {
@@ -20,7 +19,7 @@ public class UserServiceImplement implements UserService {
     @Override
     public int registerUsers(User user) {
         User temp = userRepository.findByEmail(user.getEmail());
-        if (temp != null) throw new InputValidationExceptionHandler("User is already exists!");
+        if (temp != null) throw new InputValidationExceptionHandler(Message.MSG_EXST_USER);
         User newUser = new User();
         newUser.setUsername(user.getUsername());
         newUser.setPassword(Helper.getHashPassword(user.getPassword()));
@@ -38,10 +37,10 @@ public class UserServiceImplement implements UserService {
     @Override
     public User login(User user) {
         User temp = userRepository.findByUsername(user.getUsername());
-        if (temp == null) throw new DataValidationExceptionHandler("User not found!");
+        if (temp == null) throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
         String password = Helper.getHashPassword(user.getPassword());
-        if (!temp.getPassword().equalsIgnoreCase(password))throw new InputValidationExceptionHandler("Incorrect password!");
-        if(temp.isLogin())throw new DataValidationExceptionHandler("User already login!");
+        if (!temp.getPassword().equalsIgnoreCase(password))throw new InputValidationExceptionHandler(Message.MSG_INCORRECT_IDENTITY);
+        if(temp.isLogin())throw new DataValidationExceptionHandler(Message.MSG_LGN_USER);
         temp.setLogin(true);
         this.userRepository.save(temp);
         temp.setPassword(MASK_PWD);
@@ -51,9 +50,9 @@ public class UserServiceImplement implements UserService {
     @Override
     public int resetPassword(User user) {
         User temp = userRepository.findByEmail(user.getEmail());
-        if (temp == null) throw new DataValidationExceptionHandler("User not found!");
+        if (temp == null) throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
         String password = Helper.getHashPassword(user.getPassword());
-        if(temp.getPassword().equalsIgnoreCase(password)) throw new InputValidationExceptionHandler("Your new password have to be different from the old password");
+        if(temp.getPassword().equalsIgnoreCase(password)) throw new InputValidationExceptionHandler(Message.MSG_DIFF_IDENTITY);
         temp.setPassword(password);
         userRepository.save(temp);
         return 201;
@@ -61,10 +60,9 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public User editUser(Long id,User user) {
-        Optional temp = userRepository.findById(id);
-        User dataUser = (User)temp.get();
-        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
-        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        User dataUser = userRepository.findById(id).orElse(null);
+        if(dataUser == null)throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler(Message.MSG_NOT_AUTH_USER);
         dataUser.setEmail(user.getEmail());
         dataUser.setGender(user.getGender());
         dataUser.setFirstName(user.getFirstName());
@@ -78,10 +76,9 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public int logout(Long id) {
-        Optional temp = userRepository.findById(id);
-        User dataUser = (User)temp.get();
-        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
-        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        User dataUser = userRepository.findById(id).orElse(null);
+        if(dataUser == null)throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler(Message.MSG_NOT_AUTH_USER);
         dataUser.setLogin(false);
         userRepository.save(dataUser);
         return 200;
@@ -89,10 +86,9 @@ public class UserServiceImplement implements UserService {
 
     @Override
     public User showProfile(Long id) {
-        Optional temp = userRepository.findById(id);
-        User dataUser = (User)temp.get();
-        if(dataUser == null)throw new DataValidationExceptionHandler("User not found!");
-        if(!dataUser.isLogin())throw new InputValidationExceptionHandler("You're not authorized!");
+        User dataUser = userRepository.findById(id).orElse(null);
+        if(dataUser == null)throw new DataValidationExceptionHandler(Message.MSG_NO_USER);
+        if(!dataUser.isLogin())throw new InputValidationExceptionHandler(Message.MSG_NOT_AUTH_USER);
         dataUser.setPassword(MASK_PWD);
         return dataUser;
     }
