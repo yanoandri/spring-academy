@@ -22,6 +22,13 @@ public class CategoryServiceImplement implements CategoryService {
     }
 
     @Override
+    public Category showDetailCategory(Long id) {
+        Category editCategory = categoryRepository.findByIdAndIsDeletedFalse(id);
+        if(editCategory == null)throw new DataValidationExceptionHandler(Message.MSG_CATEGORY_NOT_FOUND);
+        return editCategory;
+    }
+
+    @Override
     public Category addCategory(Category category) {
         Category newCategory = new Category();
         newCategory.setName(category.getName());

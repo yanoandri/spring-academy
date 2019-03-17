@@ -21,11 +21,21 @@ public class CategoryController {
     }
 
     @GetMapping(value = "/show")
-    public ResponseEntity login(){
+    public ResponseEntity showCategory(){
         Response response = new Response();
         List<Category> categories = categoryService.showCategory();
         response.setStatus(Response.MESSAGE_OK);
         response.setData(categories);
+        response.setMeta(new MetaResponse(HttpStatus.OK.value(), "success", ""));
+        return new ResponseEntity(response, HttpStatus.OK);
+    }
+
+    @GetMapping(value = "/show/detail/{id}")
+    public ResponseEntity showDetailCategory(@PathVariable("id") Long id){
+        Response response = new Response();
+        Category category = categoryService.showDetailCategory(id);
+        response.setStatus(Response.MESSAGE_OK);
+        response.setData(category);
         response.setMeta(new MetaResponse(HttpStatus.OK.value(), "success", ""));
         return new ResponseEntity(response, HttpStatus.OK);
     }
